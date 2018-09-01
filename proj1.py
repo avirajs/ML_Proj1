@@ -127,22 +127,22 @@ pos_count_vect.inverse_transform(pos_bag_words[0])
 negative_vocab_file = open("negative_sentiment_indicators.txt","r")
 negative_voc = negative_vocab_file.read().split('\n')
 
-count_vect = CountVectorizer(stop_words= stop_words,
+neg_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              vocabulary=negative_voc
                                 ) # an object capable of counting words in a document!
 
-bag_words = count_vect.fit_transform(documents)
-bag_words.shape
+neg_bag_words = neg_count_vect.fit_transform(documents)
+neg_bag_words.shape
 # now let's create a pandas API out of this
 pd.options.display.max_columns = 999
-df = pd.DataFrame(data=bag_words.toarray(), columns=negative_voc)
+neg_df = pd.DataFrame(data=neg_bag_words.toarray(), columns=negative_voc)
 # print out 10 most common words in our data
-df.sum().sort_values()[-10:]
+neg_df.sum().sort_values()[-10:]
 
 
 #negative words in first document
-count_vect.inverse_transform(bag_words[0])
+neg_count_vect.inverse_transform(neg_bag_words[0])
 
 preprocess(documents[0])
 
