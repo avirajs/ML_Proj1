@@ -1,6 +1,7 @@
 import glob
 import re
 import string
+import itertools
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -172,7 +173,7 @@ preprocess(documents[0])
 #         /____/
 
 
-#bigram
+#bigram count
 count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              ngram_range=(2, 2)
@@ -182,32 +183,44 @@ bag_words = count_vect.fit_transform(documents[:num_limit])
 print(bag_words.shape) # this is a sparse matrix
 print('=========')
 count_vect.inverse_transform(bag_words[0])
-
-
-# now let's create a pandas API out of this
-pd.options.display.max_columns = 999
 df = pd.DataFrame(data=bag_words.toarray(),columns=count_vect.get_feature_names())
-
+df.sum().sort_values()[-10:]
 
 # bigram tdidf
-df.sum().sort_values()[-100:]
-
 tfidf_vect = TfidfVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2), min_df=0.01, max_df=0.70)
 tfidf_mat = tfidf_vect.fit_transform(documents)
+num_limit = int(len(documents)/100)
+
+pd.options.display.max_columns = 999
+df = pd.DataFrame(data=bag_words.toarray(), columns=tfidf_mat.get_feature_names())
+df.sum().sort_values()[-100:]
+
+
+#bigram with adverb
+adverb_file = open("adverbs.txt","r")
+adverbs_voc = adverb_file.read().split('\n')
+
+adv_neg = list(map( lambda x: x[0]+ " " + x[1], itertools.product(adverbs_voc, negative_voc) ))
+adv_pos = list(map( lambda x: x[0]+ " " + x[1], itertools.product(adverbs_voc, positive_voc) ))
+
+adv_with_adj = adv_pos + adv_neg
+adv_with_adj = list(set(adv_with_adj))
+
+count_vect = CountVectorizer(stop_words= stop_words,
+                             decode_error='ignore',
+                             ngram_range=(2, 2),
+                             vocabulary=adv_with_adj
+                                ) # an object capable of counting words in a document!
 num_limit = int(len(documents)/100)
 bag_words = count_vect.fit_transform(documents[:num_limit])
 print(bag_words.shape) # this is a sparse matrix
 print('=========')
-count_vect.inverse_transform(bag_words[0])
-
-#bigram with adverb
-
-
-
-# now let's create a pandas API out of this
-pd.options.display.max_columns = 999
+documents[10]
+count_vect.inverse_transform(bag_words[10])
 df = pd.DataFrame(data=bag_words.toarray(),columns=count_vect.get_feature_names())
-df.sum().sort_values()[-100:]
+df.sum().sort_values()[-10:]
+
+
 
 
 
