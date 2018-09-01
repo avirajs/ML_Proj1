@@ -157,16 +157,16 @@ preprocess(documents[0])
 
 
 #bigram count
-count_vect = CountVectorizer(stop_words= stop_words,
+bigram_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              ngram_range=(2, 2)
                                 ) # an object capable of counting words in a document!
 num_limit = int(len(documents)/100)
-bag_words = count_vect.fit_transform(documents[:num_limit])
-print(bag_words.shape) # this is a sparse matrix
+bigram_bag_words = bigram_count_vect.fit_transform(documents[:num_limit])
+print(bigram_bag_words.shape) # this is a sparse matrix
 print('=========')
-count_vect.inverse_transform(bag_words[0])
-df = pd.DataFrame(data=bag_words.toarray(),columns=count_vect.get_feature_names())
+bigram_count_vect.inverse_transform(bigram_bag_words[0])
+df = pd.DataFrame(data=bigram_bag_words.toarray(),columns=bigram_count_vect.get_feature_names())
 df.sum().sort_values()[-10:]
 
 # bigram tdidf
@@ -175,7 +175,7 @@ tfidf_mat = tfidf_vect.fit_transform(documents)
 num_limit = int(len(documents)/100)
 
 pd.options.display.max_columns = 999
-df = pd.DataFrame(data=bag_words.toarray(), columns=tfidf_mat.get_feature_names())
+df = pd.DataFrame(data=bigram_bag_words.toarray(), columns=tfidf_mat.get_feature_names())
 df.sum().sort_values()[-100:]
 
 
