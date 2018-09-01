@@ -104,23 +104,21 @@ df.sum().sort_values()[-50:]
 positive_vocab_file = open("positive_sentiment_indicators.txt","r")
 positive_voc = positive_vocab_file.read().split('\n')
 
-count_vect = CountVectorizer(stop_words= stop_words,
+pos_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              vocabulary=positive_voc
                                 ) # an object capable of counting words in a document!
 
-bag_words = count_vect.fit_transform(documents)
-bag_words.shape
+pos_bag_words = pos_count_vect.fit_transform(documents)
+pos_bag_words.shape
 # now let's create a pandas API out of this
-pd.options.display.max_columns = 999
-cols=count_vect.get_feature_names()
-df = pd.DataFrame(data=bag_words.toarray(), columns=positive_voc)
+pos_df = pd.DataFrame(data=pos_bag_words.toarray(), columns=positive_voc)
 # print out 10 most common words in our data
-df.sum().sort_values()[-50:]
+pos_df.sum().sort_values()[-50:]
 
 
 #postive words in first document
-count_vect.inverse_transform(bag_words[0])
+pos_count_vect.inverse_transform(pos_bag_words[0])
 
 
 
