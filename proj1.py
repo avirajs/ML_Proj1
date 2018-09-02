@@ -189,19 +189,88 @@ adv_pos = list(map( lambda x: x[0]+ " " + x[1], itertools.product(adverbs_voc, p
 adv_with_adj = adv_pos + adv_neg
 adv_with_adj = list(set(adv_with_adj))
 
-count_vect = CountVectorizer(stop_words= stop_words,
+adv_bi_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              ngram_range=(2, 2),
                              vocabulary=adv_with_adj
                                 ) # an object capable of counting words in a document!
 num_limit = int(len(documents)/100)
-bag_words = count_vect.fit_transform(documents[:num_limit])
-print(bag_words.shape) # this is a sparse matrix
+adv_bi_bag_words = adv_bi_count_vect.fit_transform(documents[:num_limit])
+print(adv_bi_bag_words.shape) # this is a sparse matrix
 print('=========')
 documents[10]
-count_vect.inverse_transform(bag_words[10])
-df = pd.DataFrame(data=bag_words.toarray(),columns=count_vect.get_feature_names())
+adv_bi_count_vect.inverse_transform(adv_bi_bag_words[10])
+df = pd.DataFrame(data=adv_bi_bag_words.toarray(),columns=adv_bi_count_vect.get_feature_names())
 df.sum().sort_values()[-10:]
+
+
+#                               __      __        ____
+#    ____  ___ _      __   ____/ /___ _/ /_____ _/ __/________ _____ ___  ___
+#   / __ \/ _ \ | /| / /  / __  / __ `/ __/ __ `/ /_/ ___/ __ `/ __ `__ \/ _ \
+#  / / / /  __/ |/ |/ /  / /_/ / /_/ / /_/ /_/ / __/ /  / /_/ / / / / / /  __/
+# /_/ /_/\___/|__/|__/   \__,_/\__,_/\__/\__,_/_/ /_/   \__,_/_/ /_/ /_/\___/
+
+
+
+#Statistical dataframes by document. columns are pos, neg, vocab size, word number, greatest controversial number,
+
+
+result = pd.concat([df1, df4], axis=1, join_axes=[df1.index])
+
+length = neg_bag_words.shape[0]
+length
+pos_bag_words.shape
+
+neg_count_vect.inverse_transform(neg_bag_words[0])[0].size
+pos_count_vect.inverse_transform(pos_bag_words[0])[0].size
+
+
+data_stats = pd.DataFrame()
+
+data_stats['positive_word_count'] = [ pos_count_vect.inverse_transform(pos_bag_words[doc])[0].size for doc in range(length)]
+data_stats['negative_word_count'] = [ neg_count_vect.inverse_transform(neg_bag_words[doc])[0].size for doc in range(length)]
+data_stats['total_vocab_count'] = [ count_vect.inverse_transform(bag_words[doc])[0].size for doc in range(length)]
+
+data_stats["sentiment_score"] = data_stats.apply(lambda row: row.positive_word_count - row.negative_word_count, axis=1)
+data_stats["sentiment_occurences"] = data_stats.apply(lambda row: row.positive_word_count + row.negative_word_count, axis=1)
+
+def sentiment_classifier(row):
+
+    if row.sentiment_occurences == 0:
+        return 0
+
+    score = row.sentiment_score/row.sentiment_occurences
+
+    if score > 0.333:
+        #the good is double the bad
+        return 3
+    elif score > 0.2:
+        #the good is 50% more the bad
+        return 2
+    elif score > 0.111:
+        #the good is 25% more the bad
+        return 1
+    elif score < -0.333:
+        #the bad is double the good
+        return -3
+    elif score < -0.2:
+        #the bad is 50% more the good
+        return -2
+    elif score < -0.111:
+        #the bad is 25% more the good
+        return -1
+    else:
+        return 0
+
+data_stats["sentiment_class"] = data_stats.apply(sentiment_classifier, axis=1)
+data_stats
+
+df_grouped_sentiments = data_stats.groupby(by='sentiment_class')
+for val,grp in df_grouped_sentiments:
+    print('There were',len(grp),'reviews sentimentally rated',val)
+
+data_stats.describe
+
 
 #
 #  _    ___                  ___             __  _
