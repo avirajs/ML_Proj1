@@ -3,6 +3,10 @@ import re
 import string
 import itertools
 import pandas as pd
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import text
@@ -280,6 +284,37 @@ data_stats.describe
 # |___/_/____/\__,_/\__,_/_/_/ /___/\__,_/\__/_/\____/_/ /_/
 #
 #
+
+
+
+
+sns.set(color_codes=True)
+
+import warnings
+warnings.filterwarnings('ignore')
+sns.distplot(data_stats.sentiment_score);
+sns.distplot(data_stats.positive_word_count);
+sns.distplot(data_stats.negative_word_count);
+sns.distplot(data_stats.sentiment_occurences);
+
+
+sns.violinplot(data=data_stats, x="sentiment_score", y="sentiment_occurences", hue="sentiment_class", split=True, inner="box")
+
+
+
+#interesting note that the sentiment score is more related to the negative occurences than positive.
+drop= data_stats.drop(columns= ["sentiment_class"])
+# plot the correlation matrix using seaborn
+cmap = sns.set(style="darkgrid") # one of the many styles to plot using
+
+f, ax = plt.subplots(figsize=(5, 5))
+
+sns.heatmap(drop.corr(), cmap=cmap, annot=True)
+
+f.tight_layout()
+
+
+
 
 tfidf = TfidfVectorizer(decode_error='ignore')
 docs = tfidf.fit_transform(documents)
