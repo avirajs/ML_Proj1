@@ -254,14 +254,23 @@ def sentiment_classifier(row):
     else:
         return 0
 
-data_stats["sentiment_class"] = data_stats.apply(sentiment_classifier, axis=1)
-data_stats
+data_stats["sentiment_class"] = data_stats.apply(lambda row: 1 if row.sentiment_score>0 else 0, axis=1)
+data_stats.head()
+
+
+data_stats.describe()
+data_stats.info()
+
 
 df_grouped_sentiments = data_stats.groupby(by='sentiment_class')
 for val,grp in df_grouped_sentiments:
-    print('There were',len(grp),'reviews sentimentally rated',val)
+    type = "good" if val ==1 else "bad"
 
-data_stats.describe
+    print('There were',len(grp),'reviews sentimental words rated', type)
+
+
+
+
 
 
 #
