@@ -216,21 +216,12 @@ adv_bi_df.sum().sort_values()[-10:]
 #Statistical dataframes by document. columns are pos, neg, vocab size, word number, greatest controversial number,
 
 
-result = pd.concat([df1, df4], axis=1, join_axes=[df1.index])
-
-length = neg_bag_words.shape[0]
-length
-pos_bag_words.shape
-
-neg_count_vect.inverse_transform(neg_bag_words[0])[0].size
-pos_count_vect.inverse_transform(pos_bag_words[0])[0].size
-
-
 data_stats = pd.DataFrame()
-
+length = neg_bag_words.shape[0]
 data_stats['positive_word_count'] = [ pos_count_vect.inverse_transform(pos_bag_words[doc])[0].size for doc in range(length)]
 data_stats['negative_word_count'] = [ neg_count_vect.inverse_transform(neg_bag_words[doc])[0].size for doc in range(length)]
-data_stats['total_vocab_count'] = [ count_vect.inverse_transform(bag_words[doc])[0].size for doc in range(length)]
+data_stats['total_char_count'] = char_count
+# data_stats['total_vocab_count'] = [ count_vect.inverse_transform(bag_words[doc])[0].size for doc in range(length)]
 
 data_stats["sentiment_score"] = data_stats.apply(lambda row: row.positive_word_count - row.negative_word_count, axis=1)
 data_stats["sentiment_occurences"] = data_stats.apply(lambda row: row.positive_word_count + row.negative_word_count, axis=1)
