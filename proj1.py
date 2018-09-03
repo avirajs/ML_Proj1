@@ -54,7 +54,7 @@ example_raw = open("polarity_html/movie/0020.html")
 example_raw.read()
 
 #code to view cleaned version
-documents[0]
+len(documents[0])
 
 
 
@@ -262,11 +262,7 @@ data_stats.describe()
 data_stats.info()
 
 
-df_grouped_sentiments = data_stats.groupby(by='sentiment_class')
-for val,grp in df_grouped_sentiments:
-    type = "good" if val ==1 else "bad"
 
-    print('There were',len(grp),'reviews sentimental words rated', type)
 
 
 
@@ -282,8 +278,13 @@ for val,grp in df_grouped_sentiments:
 #
 #
 
+df_grouped_sentiments = data_stats.groupby(by='sentiment_class')
+for val,grp in df_grouped_sentiments:
+    type = "good" if val ==1 else "bad"
 
+    print('There were',len(grp),'reviews sentimental words rated', type)
 
+df_grouped_sentiments.describe()
 
 sns.set(color_codes=True)
 
