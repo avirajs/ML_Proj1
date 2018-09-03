@@ -286,29 +286,62 @@ for val,grp in df_grouped_sentiments:
 
 df_grouped_sentiments.describe()
 
-sns.set(color_codes=True)
+#grouped bar charts for both
+plt.style.use('ggplot')
 
-import warnings
+character_count = df_grouped_sentiments.total_char_count.sum()
+ax = character_count.plot(kind='bar')
+plt.title('Character Count Comparison by Mostly Negative or Positive sentiment')
+plt.show()
+
+sentiment_occurences = df_grouped_sentiments.sentiment_occurences.sum()
+ax = sentiment_occurences.plot(kind='bar')
+plt.title('Sentimental word occurences by Mostly negative or postive sentiment')
+plt.show()
+
+
+
+
+survival.plot(kind='bar', stacked=True)
+
+#term frquency charts
+neg_features   = neg_count_vect.get_feature_names()
+visualizer = FreqDistVisualizer(features=neg_features)
+visualizer.fit(neg_bag_words)
+visualizer.poof()
+
+pos_features   = pos_count_vect.get_feature_names()
+visualizer = FreqDistVisualizer(features=pos_features)
+visualizer.fit(pos_bag_words)
+visualizer.poof()
+
+adv_bi_features   = adv_bi_count_vect.get_feature_names()
+visualizer = FreqDistVisualizer(features=adv_bi_features)
+visualizer.fit(adv_bi_bag_words)
+visualizer.poof()
+
+tfidf_features   = tfidf_vect.get_feature_names()
+visualizer = FreqDistVisualizer(features=tfidf_features)
+visualizer.fit(tfidf_bag_words)
+visualizer.poof()
+
+
+#histograms
 warnings.filterwarnings('ignore')
 sns.distplot(data_stats.sentiment_score);
 sns.distplot(data_stats.positive_word_count);
 sns.distplot(data_stats.negative_word_count);
 sns.distplot(data_stats.sentiment_occurences);
-
-
-sns.violinplot(data=data_stats, x="sentiment_score", y="sentiment_occurences", hue="sentiment_class", split=True, inner="box")
+sns.distplot(data_stats.total_char_count);
 
 
 
-#interesting note that the sentiment score is more related to the negative occurences than positive.
+#heatmap
+#interesting note that the sentiment score is more related to the negative occurences than positive. Character count related to negativity
 drop= data_stats.drop(columns= ["sentiment_class"])
-# plot the correlation matrix using seaborn
-cmap = sns.set(style="darkgrid") # one of the many styles to plot using
-
+cmap = sns.set(style="darkgrid")
 f, ax = plt.subplots(figsize=(5, 5))
-
 sns.heatmap(drop.corr(), cmap=cmap, annot=True)
-
 f.tight_layout()
 
 
