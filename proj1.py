@@ -5,6 +5,7 @@ import itertools
 import pandas as pd
 import seaborn as sns
 import numpy as np
+import warnings
 import matplotlib.pyplot as plt
 from scipy import stats
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,6 +13,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import text
 from nltk.corpus import words
 from yellowbrick.text import TSNEVisualizer
+from yellowbrick.text import FreqDistVisualizer
 
 #vocabulary from:
 #http://ptrckprry.com/course/ssd/data/negative-words.txt
