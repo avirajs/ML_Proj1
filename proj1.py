@@ -37,11 +37,12 @@ def preprocess(text):
     text= text[:-579]
     return text
 
-
+char_count=[]
 documents = []
 for filename in glob.glob('polarity_html/movie/*.html'):
     with open(filename, 'rb') as f:
         raw = f.read()
+        char_count.append(len(raw))
         cleaned = preprocess(raw)
         documents.append(cleaned)
 
