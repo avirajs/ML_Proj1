@@ -77,7 +77,7 @@ print(count_vect.inverse_transform(bag_words[0]))
 
 #find words with most count, see possible stop words that have not been coverted
 df = pd.DataFrame(data=bag_words.toarray(), columns= count_vect.get_feature_names())
-df.sum().sort_values()[-50:]
+
 
 #going to see most common words and remove based on usefulness, remove document/domain specific stopwords
 #using built in english stopwords
@@ -88,14 +88,11 @@ stop_words = text.ENGLISH_STOP_WORDS.union(domain_specific_stop_words)
 #min df ignore term that only occur in 1 percent of documents, max df ifnore therms that occur in more than half of the documents
 #removed about 1/4 of the words
 tfidf_vect = TfidfVectorizer(stop_words= stop_words, decode_error='ignore', min_df=0.01, max_df=0.70)
-tfidf_mat = tfidf_vect.fit_transform(documents)
-tfidf_mat
+tfidf_bag_words = tfidf_vect.fit_transform(documents)
+tf_df = pd.DataFrame(data=tfidf_bag_words.toarray(),columns=tfidf_vect.get_feature_names())
 
-# now let's create a pandas API out of this
-pd.options.display.max_columns = 999
-df = pd.DataFrame(data=tfidf_mat.toarray(),columns=tfidf_vect.get_feature_names())
-# print out 10 most common words in our data
-df.sum().sort_values()[-50:]
+df.sum().sort_values()[-10:]
+tf_df.sum().sort_values()[-10:]
 
 
 
@@ -113,20 +110,11 @@ positive_voc = positive_vocab_file.read().split('\n')
 pos_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              vocabulary=positive_voc
-                                ) # an object capable of counting words in a document!
+                                )
 
 pos_bag_words = pos_count_vect.fit_transform(documents)
 pos_bag_words.shape
-# now let's create a pandas API out of this
 pos_df = pd.DataFrame(data=pos_bag_words.toarray(), columns=positive_voc)
-# print out 10 most common words in our data
-pos_df.sum().sort_values()[-50:]
-
-
-#postive words in first document
-pos_count_vect.inverse_transform(pos_bag_words[0])
-
-
 
 
 #using negative sentiment vocabulary
@@ -136,21 +124,23 @@ negative_voc = negative_vocab_file.read().split('\n')
 neg_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              vocabulary=negative_voc
-                                ) # an object capable of counting words in a document!
+                                )
 
 neg_bag_words = neg_count_vect.fit_transform(documents)
 neg_bag_words.shape
-# now let's create a pandas API out of this
-pd.options.display.max_columns = 999
 neg_df = pd.DataFrame(data=neg_bag_words.toarray(), columns=negative_voc)
-# print out 10 most common words in our data
-neg_df.sum().sort_values()[-10:]
+
 
 
 #negative words in first document
 neg_count_vect.inverse_transform(neg_bag_words[0])
+#postive words in first document
+pos_count_vect.inverse_transform(pos_bag_words[0])
 
-preprocess(documents[0])
+neg_df.sum().sort_values()[-10:]
+pos_df.sum().sort_values()[-10:]
+
+
 
 
 #
@@ -172,17 +162,15 @@ bigram_bag_words = bigram_count_vect.fit_transform(documents[:num_limit])
 print(bigram_bag_words.shape) # this is a sparse matrix
 print('=========')
 bigram_count_vect.inverse_transform(bigram_bag_words[0])
-df = pd.DataFrame(data=bigram_bag_words.toarray(),columns=bigram_count_vect.get_feature_names())
-df.sum().sort_values()[-10:]
+bi_count_df = pd.DataFrame(data=bigram_bag_words.toarray(),columns=bigram_count_vect.get_feature_names())
+
 
 # bigram tdidf
-tfidf_vect = TfidfVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2), min_df=0.01, max_df=0.70)
-tfidf_mat = tfidf_vect.fit_transform(documents)
+bi_tfidf_vect = TfidfVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2), min_df=0.01, max_df=0.70)
 num_limit = int(len(documents)/100)
+bi_tfidf_mat = bi_tfidf_vect.fit_transform(documents[:num_limit])
+bi_td_df = pd.DataFrame(data=bi_tfidf_mat.toarray(), columns=bi_tfidf_vect.get_feature_names())
 
-pd.options.display.max_columns = 999
-df = pd.DataFrame(data=bigram_bag_words.toarray(), columns=tfidf_mat.get_feature_names())
-df.sum().sort_values()[-100:]
 
 
 #bigram with adverb
@@ -199,15 +187,21 @@ adv_bi_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              ngram_range=(2, 2),
                              vocabulary=adv_with_adj
-                                ) # an object capable of counting words in a document!
-num_limit = int(len(documents)/100)
+                                )
+num_limit = int(len(documents)/10)
 adv_bi_bag_words = adv_bi_count_vect.fit_transform(documents[:num_limit])
-print(adv_bi_bag_words.shape) # this is a sparse matrix
-print('=========')
+
+
+
 documents[10]
 adv_bi_count_vect.inverse_transform(adv_bi_bag_words[10])
-df = pd.DataFrame(data=adv_bi_bag_words.toarray(),columns=adv_bi_count_vect.get_feature_names())
-df.sum().sort_values()[-10:]
+adv_bi_df = pd.DataFrame(data=adv_bi_bag_words.toarray(),columns=adv_bi_count_vect.get_feature_names())
+
+
+
+bi_count_df.sum().sort_values()[-10:]
+bi_td_df.sum().sort_values()[-10:]
+adv_bi_df.sum().sort_values()[-10:]
 
 
 #                               __      __        ____
