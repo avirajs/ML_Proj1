@@ -66,7 +66,7 @@ len(documents[0])
 #               /_/                                                                                           /_/
 
 
-#no settings other than english stop words
+#no settings on count other than english stop words
 count_vect = CountVectorizer(stop_words= 'english',
                              decode_error='ignore'
                                 ) # an object capable of counting words in a document!
@@ -158,6 +158,7 @@ bigram_count_vect = CountVectorizer(stop_words= stop_words,
                              decode_error='ignore',
                              ngram_range=(2, 2)
                                 ) # an object capable of counting words in a document!
+#limit set to take a sample because bigram take a while
 num_limit = int(len(documents)/100)
 bigram_bag_words = bigram_count_vect.fit_transform(documents[:num_limit])
 print(bigram_bag_words.shape) # this is a sparse matrix
@@ -168,13 +169,14 @@ bi_count_df = pd.DataFrame(data=bigram_bag_words.toarray(),columns=bigram_count_
 
 # bigram tdidf
 bi_tfidf_vect = TfidfVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2), min_df=0.01, max_df=0.70)
+#limit set to take a sample because bigram take a while
 num_limit = int(len(documents)/100)
-bi_tfidf_mat = bi_tfidf_vect.fit_transform(documents[:num_limit])
-bi_td_df = pd.DataFrame(data=bi_tfidf_mat.toarray(), columns=bi_tfidf_vect.get_feature_names())
+bi_tfidf_bag_words = bi_tfidf_vect.fit_transform(documents[:num_limit])
+bi_td_df = pd.DataFrame(data=bi_tfidf_bag_words.toarray(), columns=bi_tfidf_vect.get_feature_names())
 
 
 
-#bigram with adverb
+#bigram with adverb and sentiment vocabulary
 adverb_file = open("adverbs.txt","r")
 adverbs_voc = adverb_file.read().split('\n')
 
@@ -184,18 +186,10 @@ adv_pos = list(map( lambda x: x[0]+ " " + x[1], itertools.product(adverbs_voc, p
 adv_with_adj = adv_pos + adv_neg
 adv_with_adj = list(set(adv_with_adj))
 
-adv_bi_count_vect = CountVectorizer(stop_words= stop_words,
-                             decode_error='ignore',
-                             ngram_range=(2, 2),
-                             vocabulary=adv_with_adj
-                                )
+adv_bi_count_vect = CountVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2), vocabulary=adv_with_adj)
+
 num_limit = int(len(documents)/10)
 adv_bi_bag_words = adv_bi_count_vect.fit_transform(documents[:num_limit])
-
-
-
-documents[10]
-adv_bi_count_vect.inverse_transform(adv_bi_bag_words[10])
 adv_bi_df = pd.DataFrame(data=adv_bi_bag_words.toarray(),columns=adv_bi_count_vect.get_feature_names())
 
 
@@ -213,7 +207,7 @@ adv_bi_df.sum().sort_values()[-10:]
 
 
 
-#Statistical dataframes by document. columns are pos, neg, vocab size, word number, greatest controversial number,
+#Statistical dataframes by document. columns are pos, neg, vocab size, character number, sentiment vocab numbner and class score
 
 
 data_stats = pd.DataFrame()
