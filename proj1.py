@@ -12,9 +12,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction import text
 from nltk.corpus import words
-from yellowbrick.text import TSNEVisualizer
 from yellowbrick.text import FreqDistVisualizer
-
+from stemmer import *
+import stemmer as mystem
+#suffixes from www.thoughco.com
 #vocabulary from:
 #http://ptrckprry.com/course/ssd/data/negative-words.txt
 #http://ptrckprry.com/course/ssd/data/positive-words.txt
