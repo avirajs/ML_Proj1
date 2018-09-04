@@ -301,32 +301,3 @@ cmap = sns.set(style="darkgrid")
 f, ax = plt.subplots(figsize=(5, 5))
 sns.heatmap(drop.corr(), cmap=cmap, annot=True)
 f.tight_layout()
-
-
-
-
-tfidf = TfidfVectorizer(decode_error='ignore')
-docs = tfidf.fit_transform(documents)
-
-from sklearn.cluster import KMeans
-
-clusters = KMeans(n_clusters=2)
-clusters.fit(docs)
-
-tsne = TSNEVisualizer()
-tsne.fit(docs, ["c{}".format(c) for c in clusters.labels_])
-tsne.poof()
-
-# pd.options.display.max_columns = 999
-# df = pd.DataFrame(data=bag_words.toarray(),columns=count_vect.get_feature_names())
-# df
-# df.max().sort_values()[-10:]
-tfidf = TfidfVectorizer(decode_error='ignore')
-docs = tfidf.fit_transform(documents)
-
-
-tsne = TSNEVisualizer(labels=["documents"])
-
-
-tsne.fit(docs)
-tsne.poof()
