@@ -215,40 +215,39 @@ length = neg_bag_words.shape[0]
 data_stats['positive_word_count'] = [ pos_count_vect.inverse_transform(pos_bag_words[doc])[0].size for doc in range(length)]
 data_stats['negative_word_count'] = [ neg_count_vect.inverse_transform(neg_bag_words[doc])[0].size for doc in range(length)]
 data_stats['total_char_count'] = char_count
-# data_stats['total_vocab_count'] = [ count_vect.inverse_transform(bag_words[doc])[0].size for doc in range(length)]
-
 data_stats["sentiment_score"] = data_stats.apply(lambda row: row.positive_word_count - row.negative_word_count, axis=1)
 data_stats["sentiment_occurences"] = data_stats.apply(lambda row: row.positive_word_count + row.negative_word_count, axis=1)
 
-def sentiment_classifier(row):
+def sentiment_level(row):
 
     if row.sentiment_occurences == 0:
-        return 0
+        return "-1 No Sentiment"
 
     score = row.sentiment_score/row.sentiment_occurences
 
     if score > 0.333:
         #the good is double the bad
-        return 3
+        return "6 Very Good"
     elif score > 0.2:
         #the good is 50% more the bad
-        return 2
+        return "5 Good"
     elif score > 0.111:
         #the good is 25% more the bad
-        return 1
+        return "4 Alright"
     elif score < -0.333:
         #the bad is double the good
-        return -3
+        return "3 Very Bad"
     elif score < -0.2:
         #the bad is 50% more the good
-        return -2
+        return "2 Bad"
     elif score < -0.111:
         #the bad is 25% more the good
-        return -1
+        return "1 Not Alright"
     else:
-        return 0
+        return "0 Neutral"
 
 data_stats["sentiment_class"] = data_stats.apply(lambda row: 1 if row.sentiment_score>0 else 0, axis=1)
+data_stats["sentiment_level"] = data_stats.apply(lambda row: sentiment_level(row), axis=1)
 data_stats.head()
 
 
