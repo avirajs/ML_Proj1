@@ -16,7 +16,7 @@ from yellowbrick.text import FreqDistVisualizer
 from stemmer import *
 import stemmer as mystem
 #suffixes from www.thoughco.com
-#vocabulary from:
+#sentiment vocabulary from:
 #http://ptrckprry.com/course/ssd/data/negative-words.txt
 #http://ptrckprry.com/course/ssd/data/positive-words.txt
 
