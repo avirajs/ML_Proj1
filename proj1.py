@@ -38,7 +38,7 @@ def preprocess(text):
     text= text[:-579]
     return text
 
-char_count=[]
+char_count=[]#keep track of characters
 documents = []
 for filename in glob.glob('polarity_html/movie/*.html'):
     with open(filename, 'rb') as f:
@@ -64,12 +64,19 @@ len(documents[0])
 # /____/\__/\____/ .___/    |__/|__/\____/_/   \__,_/____/   \__,_/_/ /_/\__,_/   \___/_/\___/\__,_/_/ /_/\__,_/ .___/
 #               /_/                                                                                           /_/
 
-#no settings on count other than english stop words
-count_vect = CountVectorizer(stop_words= 'english', decode_error='ignore') # an object capable of counting words in a document!
+#using english stop words and my stemmer
+analyzer = CountVectorizer(decode_error='ignore').build_analyzer()
+
+def stemmed_words(doc):
+    return (mystem.stem(w) for w in analyzer(doc))
+#218,754 without change
+#169,256 with professional stemmer
+#198,484 with my suffix/prefix remover
+count_vect = CountVectorizer(stop_words= 'english', decode_error='ignore', analyzer=stemmed_words) # an object capable of counting words in a document!
 bag_words = count_vect.fit_transform(documents)
-print(bag_words)
 print(bag_words.shape)
 print(count_vect.inverse_transform(bag_words[0]))
+
 
 #find words with most count, see possible stop words that have not been coverted
 df = pd.DataFrame(data=bag_words.toarray(), columns= count_vect.get_feature_names())
@@ -139,7 +146,6 @@ bigram_count_vect = CountVectorizer(stop_words= stop_words, decode_error='ignore
 num_limit = int(len(documents)/100)
 bigram_bag_words = bigram_count_vect.fit_transform(documents[:num_limit])
 print(bigram_bag_words.shape) # this is a sparse matrix
-print('=========')
 bigram_count_vect.inverse_transform(bigram_bag_words[0])
 bi_count_df = pd.DataFrame(data=bigram_bag_words.toarray(),columns=bigram_count_vect.get_feature_names())
 
