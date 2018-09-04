@@ -271,31 +271,30 @@ data_stats.info()
 #
 #
 
-df_grouped_sentiments = data_stats.groupby(by='sentiment_class')
+df_grouped_sentiments = data_stats.groupby(by='sentiment_level')
 for val,grp in df_grouped_sentiments:
-    type = "good" if val ==1 else "bad"
-
-    print('There were',len(grp),'reviews sentimental words rated', type)
+    print('There were',len(grp),'reviews sentimental words rated', val)
 
 df_grouped_sentiments.describe()
 
 #grouped bar charts for both
 plt.style.use('ggplot')
 
-character_count = df_grouped_sentiments.total_char_count.sum()
+character_count = df_grouped_sentiments.total_char_count.median()
 ax = character_count.plot(kind='bar')
 plt.title('Character Count Comparison by Mostly Negative or Positive sentiment')
 plt.show()
 
-sentiment_occurences = df_grouped_sentiments.sentiment_occurences.sum()
+sentiment_occurences = df_grouped_sentiments.sentiment_occurences.median()
 ax = sentiment_occurences.plot(kind='bar')
-plt.title('Sentimental word occurences by Mostly negative or postive sentiment')
+plt.title('Sentimental Word Occurences')
 plt.show()
 
+sentiment_score = abs(df_grouped_sentiments.sentiment_score.median())
+ax = sentiment_score.plot(kind='bar')
+plt.title('Sentiment Score')
+plt.show()
 
-
-
-survival.plot(kind='bar', stacked=True)
 
 #term frquency charts
 neg_features   = neg_count_vect.get_feature_names()
