@@ -151,29 +151,25 @@ bi_tfidf_bag_words = bi_tfidf_vect.fit_transform(documents[:num_limit])
 bi_td_df = pd.DataFrame(data=bi_tfidf_bag_words.toarray(), columns=bi_tfidf_vect.get_feature_names())
 
 
-
 #bigram with adverb and sentiment vocabulary
 adverb_file = open("adverbs.txt","r")
 adverbs_voc = adverb_file.read().split('\n')
-
+#cartesian product to add adverbs in front of each sentiment word
 adv_neg = list(map( lambda x: x[0]+ " " + x[1], itertools.product(adverbs_voc, negative_voc) ))
 adv_pos = list(map( lambda x: x[0]+ " " + x[1], itertools.product(adverbs_voc, positive_voc) ))
-
 adv_with_adj = adv_pos + adv_neg
 adv_with_adj = list(set(adv_with_adj))
 
 adv_bi_count_vect = CountVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2), vocabulary=adv_with_adj)
-
 num_limit = int(len(documents)/10)
 adv_bi_bag_words = adv_bi_count_vect.fit_transform(documents[:num_limit])
 adv_bi_df = pd.DataFrame(data=adv_bi_bag_words.toarray(),columns=adv_bi_count_vect.get_feature_names())
 
 
-
+#top 10 for each
 bi_count_df.sum().sort_values()[-10:]
 bi_td_df.sum().sort_values()[-10:]
 adv_bi_df.sum().sort_values()[-10:]
-
 
 #                               __      __        ____
 #    ____  ___ _      __   ____/ /___ _/ /_____ _/ __/________ _____ ___  ___
@@ -181,17 +177,16 @@ adv_bi_df.sum().sort_values()[-10:]
 #  / / / /  __/ |/ |/ /  / /_/ / /_/ / /_/ /_/ / __/ /  / /_/ / / / / / /  __/
 # /_/ /_/\___/|__/|__/   \__,_/\__,_/\__/\__,_/_/ /_/   \__,_/_/ /_/ /_/\___/
 
-
-
 #Statistical dataframes by document. columns are pos, neg, vocab size, character number, sentiment vocab numbner and class score
-
-
 data_stats = pd.DataFrame()
 length = neg_bag_words.shape[0]
 data_stats['positive_word_count'] = [ pos_count_vect.inverse_transform(pos_bag_words[doc])[0].size for doc in range(length)]
 data_stats['negative_word_count'] = [ neg_count_vect.inverse_transform(neg_bag_words[doc])[0].size for doc in range(length)]
+#total characters used
 data_stats['total_char_count'] = char_count
+#positive - negative sentiment words
 data_stats["sentiment_score"] = data_stats.apply(lambda row: row.positive_word_count - row.negative_word_count, axis=1)
+#how many sentiment vocabs occur
 data_stats["sentiment_occurences"] = data_stats.apply(lambda row: row.positive_word_count + row.negative_word_count, axis=1)
 
 def sentiment_level(row):
@@ -222,7 +217,9 @@ def sentiment_level(row):
     else:
         return "0 Neutral"
 
+#0 or 1
 data_stats["sentiment_class"] = data_stats.apply(lambda row: 1 if row.sentiment_score>0 else 0, axis=1)
+#0-6 rating
 data_stats["sentiment_level"] = data_stats.apply(lambda row: sentiment_level(row), axis=1)
 data_stats.head()
 
