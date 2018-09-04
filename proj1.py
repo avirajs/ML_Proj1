@@ -56,8 +56,6 @@ example_raw.read()
 #code to view cleaned version
 len(documents[0])
 
-
-
 #          __                                         __                        __        __
 #    _____/ /_____  ____     _      ______  _________/ /____   ____ _____  ____/ /  _____/ /__  ____ _____  __  ______
 #   / ___/ __/ __ \/ __ \   | | /| / / __ \/ ___/ __  / ___/  / __ `/ __ \/ __  /  / ___/ / _ \/ __ `/ __ \/ / / / __ \
@@ -65,12 +63,8 @@ len(documents[0])
 # /____/\__/\____/ .___/    |__/|__/\____/_/   \__,_/____/   \__,_/_/ /_/\__,_/   \___/_/\___/\__,_/_/ /_/\__,_/ .___/
 #               /_/                                                                                           /_/
 
-
 #no settings on count other than english stop words
-count_vect = CountVectorizer(stop_words= 'english',
-                             decode_error='ignore'
-                                ) # an object capable of counting words in a document!
-
+count_vect = CountVectorizer(stop_words= 'english', decode_error='ignore') # an object capable of counting words in a document!
 bag_words = count_vect.fit_transform(documents)
 print(bag_words)
 print(bag_words.shape)
@@ -78,7 +72,6 @@ print(count_vect.inverse_transform(bag_words[0]))
 
 #find words with most count, see possible stop words that have not been coverted
 df = pd.DataFrame(data=bag_words.toarray(), columns= count_vect.get_feature_names())
-
 
 #going to see most common words and remove based on usefulness, remove document/domain specific stopwords
 #using built in english stopwords
@@ -92,10 +85,9 @@ tfidf_vect = TfidfVectorizer(stop_words= stop_words, decode_error='ignore', min_
 tfidf_bag_words = tfidf_vect.fit_transform(documents)
 tf_df = pd.DataFrame(data=tfidf_bag_words.toarray(),columns=tfidf_vect.get_feature_names())
 
+#top 10 for each
 df.sum().sort_values()[-10:]
 tf_df.sum().sort_values()[-10:]
-
-
 
 #     ____  ____  _____(_) /_(_)   _____     ____ _____  ____/ /  ____  ___  ____ _____ _/ /_(_)   _____
 #    / __ \/ __ \/ ___/ / __/ / | / / _ \   / __ `/ __ \/ __  /  / __ \/ _ \/ __ `/ __ `/ __/ / | / / _ \
@@ -103,16 +95,11 @@ tf_df.sum().sort_values()[-10:]
 #  / .___/\____/____/_/\__/_/ |___/\___/   \__,_/_/ /_/\__,_/  /_/ /_/\___/\__, /\__,_/\__/_/ |___/\___/
 # /_/                                                                     /____/
 
-
 #using postive sentiment vocabulary
 positive_vocab_file = open("positive_sentiment_indicators.txt","r")
 positive_voc = positive_vocab_file.read().split('\n')
 
-pos_count_vect = CountVectorizer(stop_words= stop_words,
-                             decode_error='ignore',
-                             vocabulary=positive_voc
-                                )
-
+pos_count_vect = CountVectorizer(stop_words= stop_words, decode_error='ignore', vocabulary=positive_voc)
 pos_bag_words = pos_count_vect.fit_transform(documents)
 pos_bag_words.shape
 pos_df = pd.DataFrame(data=pos_bag_words.toarray(), columns=positive_voc)
@@ -122,27 +109,20 @@ pos_df = pd.DataFrame(data=pos_bag_words.toarray(), columns=positive_voc)
 negative_vocab_file = open("negative_sentiment_indicators.txt","r")
 negative_voc = negative_vocab_file.read().split('\n')
 
-neg_count_vect = CountVectorizer(stop_words= stop_words,
-                             decode_error='ignore',
-                             vocabulary=negative_voc
-                                )
+neg_count_vect = CountVectorizer(stop_words= stop_words, decode_error='ignore', vocabulary=negative_voc)
 
 neg_bag_words = neg_count_vect.fit_transform(documents)
 neg_bag_words.shape
 neg_df = pd.DataFrame(data=neg_bag_words.toarray(), columns=negative_voc)
-
-
 
 #negative words in first document
 neg_count_vect.inverse_transform(neg_bag_words[0])
 #postive words in first document
 pos_count_vect.inverse_transform(pos_bag_words[0])
 
+#top 10 for each
 neg_df.sum().sort_values()[-10:]
 pos_df.sum().sort_values()[-10:]
-
-
-
 
 #
 #    ____  _
@@ -152,12 +132,8 @@ pos_df.sum().sort_values()[-10:]
 # /_____/_/\__, /_/   \__,_/_/ /_/ /_/____/
 #         /____/
 
-
 #bigram count
-bigram_count_vect = CountVectorizer(stop_words= stop_words,
-                             decode_error='ignore',
-                             ngram_range=(2, 2)
-                                ) # an object capable of counting words in a document!
+bigram_count_vect = CountVectorizer(stop_words= stop_words, decode_error='ignore', ngram_range=(2, 2))
 #limit set to take a sample because bigram take a while
 num_limit = int(len(documents)/100)
 bigram_bag_words = bigram_count_vect.fit_transform(documents[:num_limit])
@@ -255,13 +231,6 @@ data_stats.describe()
 data_stats.info()
 
 
-
-
-
-
-
-
-
 #
 #  _    ___                  ___             __  _
 # | |  / (_)______  ______ _/ (_)___  ____ _/ /_(_)___  ____
@@ -276,6 +245,7 @@ for val,grp in df_grouped_sentiments:
     print('There were',len(grp),'reviews sentimental words rated', val)
 
 df_grouped_sentiments.describe()
+
 
 #grouped bar charts for both
 plt.style.use('ggplot')
@@ -325,7 +295,6 @@ sns.distplot(data_stats.positive_word_count);
 sns.distplot(data_stats.negative_word_count);
 sns.distplot(data_stats.sentiment_occurences);
 sns.distplot(data_stats.total_char_count);
-
 
 
 #heatmap
